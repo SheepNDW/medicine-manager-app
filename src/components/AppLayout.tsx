@@ -12,7 +12,7 @@ import { Dropdown, Layout, Menu, message, theme } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
-import logo from '../assets/logo.jpeg';
+import { defaultImg as logo } from '../utils/tools';
 
 const AppLayout = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
