@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -7,7 +8,7 @@ import {
   VideoCameraOutlined,
   DashboardOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
+import { Dropdown, Layout, Menu, message, theme } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
@@ -19,6 +20,8 @@ const AppLayout = ({ children }: any) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const navigate = useNavigate();
+
   return (
     <Layout style={{ width: '100vw', height: '100vh' }} id="components-layout-demo-custom-trigger">
       <Sider trigger={null} collapsible collapsed={collapsed} theme="light">
@@ -29,32 +32,35 @@ const AppLayout = ({ children }: any) => {
           theme="light"
           mode="inline"
           defaultSelectedKeys={['1']}
+          onClick={({ key }) => {
+            navigate(key);
+          }}
           items={[
             {
-              key: '1',
+              key: '/admin/dashboard',
               icon: <DashboardOutlined />,
               label: '看板',
             },
             {
-              key: '2',
+              key: '/admin/medicine',
               icon: <VideoCameraOutlined />,
               label: '藥品管理',
               children: [
-                { label: '藥品分類', key: '/admin/medicine_categories' },
-                { label: '藥品資訊', key: '/admin/medicines' },
+                { label: '藥品分類', key: '/admin/medicine/categories' },
+                { label: '藥品資訊', key: '/admin/medicine/list' },
               ],
             },
             {
-              key: '3',
+              key: '/admin/articles',
               icon: <UploadOutlined />,
               label: '文章管理',
               children: [
-                { label: '文章分類', key: '/admin/article_categories' },
-                { label: '文章資訊', key: '/admin/articles' },
+                { label: '文章分類', key: '/admin/articles/categories' },
+                { label: '文章資訊', key: '/admin/articles/list' },
               ],
             },
             {
-              key: '4',
+              key: '/admin/users',
               icon: <UserOutlined />,
               label: '會員資訊',
             },
@@ -67,6 +73,30 @@ const AppLayout = ({ children }: any) => {
             className: 'trigger',
             onClick: () => setCollapsed(!collapsed),
           })}
+          <span className="app-title">好大夫管理平臺系統</span>
+          <Dropdown
+            menu={{
+              items: [
+                { label: '個人中心', key: 'userCenter' },
+                { label: '退出', key: 'logOut' },
+              ],
+              onClick: ({ key }) => {
+                if (key === 'logOut') navigate('/');
+                else message.info('暫未開通');
+              },
+            }}
+          >
+            <img
+              src={logo}
+              style={{
+                width: '30px',
+                borderRadius: '50%',
+                float: 'right',
+                marginTop: '1rem',
+                marginRight: '20px',
+              }}
+            />
+          </Dropdown>
         </Header>
         <Content
           style={{
