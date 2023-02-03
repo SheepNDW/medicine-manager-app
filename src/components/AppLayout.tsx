@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   MenuFoldOutlined,
@@ -8,7 +8,7 @@ import {
   VideoCameraOutlined,
   DashboardOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Layout, Menu, message, theme } from 'antd';
+import { Breadcrumb, Dropdown, Layout, Menu, message, theme } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
@@ -62,15 +62,41 @@ const findOpenKeys = (key: string) => {
   return result;
 };
 
+const findDeepPath = (key: string) => {
+  const result: any[] = [];
+
+  const findInfo = (arr: any[]) => {
+    arr.forEach((item) => {
+      const { children, ...info } = item;
+      result.push(info);
+      if (children) {
+        findInfo(children);
+      }
+    });
+  };
+  findInfo(sideMenuData);
+  const tempData = result.filter((item) => key.includes(item.key));
+  if (tempData.length > 0) {
+    return [{ label: '首頁', key: '/admin/dashboard' }, ...tempData];
+  }
+  return [];
+};
+
 const AppLayout = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const [breadcrumbs, setBreadcrumbs] = useState<any[]>([]);
+
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const tempOpenKeys = findOpenKeys(pathname);
+
+  useEffect(() => {
+    setBreadcrumbs(findDeepPath(pathname));
+  }, [pathname]);
 
   return (
     <Layout style={{ width: '100vw', height: '100vh' }} id="components-layout-demo-custom-trigger">
@@ -128,6 +154,11 @@ const AppLayout = ({ children }: any) => {
             background: colorBgContainer,
           }}
         >
+          <Breadcrumb>
+            {breadcrumbs.map((item) => (
+              <Breadcrumb.Item key={item.label}>{item.label}</Breadcrumb.Item>
+            ))}
+          </Breadcrumb>
           {children}
         </Content>
       </Layout>
