@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -14,6 +14,54 @@ const { Header, Sider, Content } = Layout;
 
 import { defaultImg as logo } from '../utils/tools';
 
+const sideMenuData = [
+  {
+    key: '/admin/dashboard',
+    icon: <DashboardOutlined />,
+    label: '看板',
+  },
+  {
+    key: '/admin/medicine',
+    icon: <VideoCameraOutlined />,
+    label: '藥品管理',
+    children: [
+      { label: '藥品分類', key: '/admin/medicine/categories' },
+      { label: '藥品資訊', key: '/admin/medicine/list' },
+    ],
+  },
+  {
+    key: '/admin/articles',
+    icon: <UploadOutlined />,
+    label: '文章管理',
+    children: [
+      { label: '文章分類', key: '/admin/articles/categories' },
+      { label: '文章資訊', key: '/admin/articles/list' },
+    ],
+  },
+  {
+    key: '/admin/users',
+    icon: <UserOutlined />,
+    label: '會員資訊',
+  },
+];
+
+const findOpenKeys = (key: string) => {
+  const result: string[] = [];
+  const findInfo = (arr: any[]) => {
+    arr.forEach((item) => {
+      if (key.includes(item.key)) {
+        result.push(item.key);
+        if (item.children) {
+          // 遞迴查詢頁面刷新後預設選中項
+          findInfo(item.children);
+        }
+      }
+    });
+  };
+  findInfo(sideMenuData);
+  return result;
+};
+
 const AppLayout = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
@@ -21,6 +69,8 @@ const AppLayout = ({ children }: any) => {
   } = theme.useToken();
 
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const tempOpenKeys = findOpenKeys(pathname);
 
   return (
     <Layout style={{ width: '100vw', height: '100vh' }} id="components-layout-demo-custom-trigger">
@@ -31,40 +81,12 @@ const AppLayout = ({ children }: any) => {
         <Menu
           theme="light"
           mode="inline"
-          defaultSelectedKeys={['1']}
+          defaultOpenKeys={tempOpenKeys}
+          defaultSelectedKeys={tempOpenKeys}
           onClick={({ key }) => {
             navigate(key);
           }}
-          items={[
-            {
-              key: '/admin/dashboard',
-              icon: <DashboardOutlined />,
-              label: '看板',
-            },
-            {
-              key: '/admin/medicine',
-              icon: <VideoCameraOutlined />,
-              label: '藥品管理',
-              children: [
-                { label: '藥品分類', key: '/admin/medicine/categories' },
-                { label: '藥品資訊', key: '/admin/medicine/list' },
-              ],
-            },
-            {
-              key: '/admin/articles',
-              icon: <UploadOutlined />,
-              label: '文章管理',
-              children: [
-                { label: '文章分類', key: '/admin/articles/categories' },
-                { label: '文章資訊', key: '/admin/articles/list' },
-              ],
-            },
-            {
-              key: '/admin/users',
-              icon: <UserOutlined />,
-              label: '會員資訊',
-            },
-          ]}
+          items={sideMenuData}
         />
       </Sider>
       <Layout className="site-layout">

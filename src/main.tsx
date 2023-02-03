@@ -9,7 +9,6 @@ import './index.css';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import AppLayout from './components/AppLayout';
 import Users from './pages/Users';
 import ArticleList from './pages/articles/List';
 import ArticleCategories from './pages/articles/Categories';
