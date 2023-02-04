@@ -1,11 +1,21 @@
 import { Card, Button, Form, Input, Table, Space, Modal, message } from 'antd';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import ImageUpload from '../../components/ImageUpload';
+import { loadDataAPI } from '../../services/medicine-categories';
+import { delImg } from '../../utils/tools';
 
 const MedicineCategories = () => {
   const [isModalShow, setIsModalShow] = useState(false);
   const [modalForm] = Form.useForm();
+  const [query, setQuery] = useState({});
+  const [medicineCategories, setMedicineCategories] = useState([]);
+
+  useEffect(() => {
+    loadDataAPI(query).then((res) => {
+      setMedicineCategories(res.data.list);
+    });
+  }, [query]);
 
   return (
     <>
@@ -30,12 +40,40 @@ const MedicineCategories = () => {
             </Form.Item>
           </Form>
           <Table
+            dataSource={medicineCategories}
+            rowKey="id"
             columns={[
-              { title: '序號', width: 80, align: 'center' },
-              { title: '名稱' },
-              { title: '主圖', width: 120 },
-              { title: '簡介' },
-              { title: '操作', width: 110 },
+              {
+                title: '序號',
+                width: 80,
+                align: 'center',
+                render(v, r, i) {
+                  return <>{i + 1}</>;
+                },
+              },
+              { title: '名稱', dataIndex: 'name', width: 180 },
+              {
+                title: '主圖',
+                width: 120,
+                align: 'center',
+                render(v, r: any) {
+                  return <img src={delImg(r.image)} alt={r.name} className="t-img" />;
+                },
+              },
+              { title: '簡介', dataIndex: 'desc' },
+              {
+                title: '操作',
+                width: 110,
+                align: 'center',
+                render() {
+                  return (
+                    <Space>
+                      <Button type="primary" icon={<EditOutlined />} size="small" />
+                      <Button danger icon={<DeleteOutlined />} size="small" />
+                    </Space>
+                  );
+                },
+              },
             ]}
           />
         </Space>

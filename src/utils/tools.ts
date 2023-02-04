@@ -17,3 +17,14 @@ export const setToken = (token: string) => sessionStorage.setItem('hdf-token', t
  * @returns The retrieved token, or null if the key doesn't exist.
  */
 export const getToken = (key: string = 'hdf-token') => sessionStorage.getItem(key);
+
+/**
+ * image handler
+ */
+export const delImg = (img: string) => {
+  if (img) {
+    if (img.startsWith('http')) return img;
+    return serverUrl + img;
+  }
+  return defaultImg;
+};

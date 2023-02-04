@@ -61,6 +61,15 @@ export const request = {
     return instance.put(url, data).then((res) => res.data);
   },
   /**
+   * Send a PATCH request.
+   * @param url - The URL for the request.
+   * @param [data={}] - The data to send with the request.
+   * @returns The response data.
+   */
+  patch: async (url: string, data: any = {}) => {
+    return instance.put(url, data).then((res) => res.data);
+  },
+  /**
    * Send a DELETE request.
    * @param url - The URL for the request.
    * @returns The response data.
