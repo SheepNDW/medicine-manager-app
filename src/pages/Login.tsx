@@ -1,6 +1,7 @@
 import { Button, Card, Col, Form, Input, message, Row } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { defaultImg } from '../utils/tools';
+import { loginAPI } from '../services/auth';
+import { defaultImg, setToken } from '../utils/tools';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -35,15 +36,21 @@ const Login = () => {
               },
             }}
             autoComplete="off"
-            onFinish={(v) => {
-              console.log(v);
-              message.success('登入成功！');
-              navigate('/admin/dashboard');
+            onFinish={async (v) => {
+              const res = await loginAPI(v);
+
+              if (res.success) {
+                message.success('登入成功！');
+                setToken(res.data);
+                navigate('/admin/dashboard');
+              } else {
+                message.error(res.errorMessage);
+              }
             }}
           >
             <Form.Item
               label="帳號"
-              name="username"
+              name="userName"
               rules={[
                 {
                   required: true,
