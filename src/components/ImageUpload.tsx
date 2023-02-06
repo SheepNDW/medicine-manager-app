@@ -3,12 +3,7 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Upload } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
-
-const getBase64 = (img: RcFile, callback: (url: string) => void) => {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-};
+import { delImg, uploadActionUrl } from '../utils/tools';
 
 const beforeUpload = (file: RcFile) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -22,9 +17,13 @@ const beforeUpload = (file: RcFile) => {
   return isJpgOrPng && isLt2M;
 };
 
-const ImageUpload: React.FC = () => {
+interface ImageUploadProps {
+  imageUrl: string;
+  setImageUrl: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({ imageUrl, setImageUrl }) => {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>();
 
   const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
     if (info.file.status === 'uploading') {
@@ -32,11 +31,8 @@ const ImageUpload: React.FC = () => {
       return;
     }
     if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as RcFile, (url) => {
-        setLoading(false);
-        setImageUrl(url);
-      });
+      setLoading(false);
+      setImageUrl(info.file.response.data);
     }
   };
 
@@ -50,16 +46,20 @@ const ImageUpload: React.FC = () => {
   return (
     <Upload
       // name 表示 server 端 api 接收的資料屬性名
-      name="avatar"
+      name="file"
       listType="picture-card"
       className="avatar-uploader"
       showUploadList={false}
       // action 表示 server 端的檔案上傳 api
-      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      action={uploadActionUrl}
       beforeUpload={beforeUpload}
       onChange={handleChange}
     >
-      {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+      {imageUrl ? (
+        <img src={delImg(imageUrl)} alt="avatar" style={{ width: '100%' }} />
+      ) : (
+        uploadButton
+      )}
     </Upload>
   );
 };

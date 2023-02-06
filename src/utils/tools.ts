@@ -4,6 +4,8 @@ export const defaultImg = logo;
 
 /** api url */
 export const serverUrl = 'http://localhost:3006';
+/** file upload api */
+export const uploadActionUrl = serverUrl + '/common/upload';
 
 /**
  * Set the token in session storage.
