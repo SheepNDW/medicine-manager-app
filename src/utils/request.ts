@@ -67,7 +67,7 @@ export const request = {
    * @returns The response data.
    */
   patch: async (url: string, data: any = {}) => {
-    return instance.put(url, data).then((res) => res.data);
+    return instance.patch(url, data).then((res) => res.data);
   },
   /**
    * Send a DELETE request.
