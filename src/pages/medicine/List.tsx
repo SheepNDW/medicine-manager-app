@@ -5,6 +5,7 @@ import ImageUpload from '../../components/ImageUpload';
 import { loadDataAPI, insertAPI, updateByIdAPI, delByIdAPI } from '../../services/medicines';
 import { loadDataAPI as loadCategoriesAPI } from '../../services/medicine-categories';
 import { delImg } from '../../utils/tools';
+import TextEditor from '../../components/TextEditor';
 
 const MedicineList = () => {
   const [isModalShow, setIsModalShow] = useState(false);
@@ -15,6 +16,8 @@ const MedicineList = () => {
   const [total, setTotal] = useState(0);
   const [imageUrl, setImageUrl] = useState<string>('');
   const [categories, setCategories] = useState([]);
+
+  const [html, setHtml] = useState(''); // text editor content
 
   useEffect(() => {
     loadDataAPI(query).then((res) => {
@@ -27,6 +30,7 @@ const MedicineList = () => {
     if (!isModalShow) {
       setCurrentID('');
       setImageUrl('');
+      setHtml('');
     }
   }, [isModalShow]);
 
@@ -94,7 +98,7 @@ const MedicineList = () => {
                 title: '操作',
                 width: 110,
                 align: 'center',
-                render(v, r: any) {
+                render(v, r: MedicineInfo.Medicine) {
                   return (
                     <Space>
                       <Button
@@ -105,6 +109,7 @@ const MedicineList = () => {
                           setIsModalShow(true);
                           setCurrentID(r.id);
                           setImageUrl(r.image);
+                          setHtml(r.content);
                           modalForm.setFieldsValue(r);
                         }}
                       />
@@ -136,6 +141,7 @@ const MedicineList = () => {
         </Space>
       </Card>
       <Modal
+        width="1000px"
         title="編輯"
         maskClosable={false}
         open={isModalShow}
@@ -149,9 +155,9 @@ const MedicineList = () => {
           preserve={false}
           onFinish={async (v) => {
             if (currentID) {
-              await updateByIdAPI(currentID, { ...v, image: imageUrl });
+              await updateByIdAPI(currentID, { ...v, image: imageUrl, content: html });
             } else {
-              await insertAPI({ ...v, image: imageUrl });
+              await insertAPI({ ...v, image: imageUrl, content: html });
             }
             message.success('保存成功');
             setIsModalShow(false);
@@ -178,6 +184,9 @@ const MedicineList = () => {
           </Form.Item>
           <Form.Item label="簡介" name="desc">
             <Input.TextArea placeholder="請輸入名稱" />
+          </Form.Item>
+          <Form.Item label="詳情">
+            <TextEditor html={html} setHtml={setHtml} />
           </Form.Item>
         </Form>
       </Modal>
