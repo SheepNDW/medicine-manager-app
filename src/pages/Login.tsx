@@ -1,10 +1,13 @@
 import { Button, Card, Col, Form, Input, message, Row } from 'antd';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { context } from '../components/AppProvider';
 import { loginAPI } from '../services/auth';
 import { defaultImg, setToken } from '../utils/tools';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { resetMenus } = useContext(context);
 
   return (
     <Row>
@@ -42,6 +45,7 @@ const Login = () => {
               if (res.success) {
                 message.success('登入成功！');
                 setToken(res.data);
+                resetMenus('admin');
                 navigate('/admin/dashboard');
               } else {
                 message.error(res.errorMessage);

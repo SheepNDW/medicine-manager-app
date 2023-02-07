@@ -1,51 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-  DashboardOutlined,
-} from '@ant-design/icons';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Breadcrumb, Dropdown, Layout, Menu, message, theme } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
 import { defaultImg as logo } from '../utils/tools';
+import { context } from './AppProvider';
 
-const sideMenuData = [
-  {
-    key: '/admin/dashboard',
-    icon: <DashboardOutlined />,
-    label: '看板',
-  },
-  {
-    key: '/admin/medicine',
-    icon: <VideoCameraOutlined />,
-    label: '藥品管理',
-    children: [
-      { label: '藥品分類', key: '/admin/medicine/categories' },
-      { label: '藥品資訊', key: '/admin/medicine/list' },
-    ],
-  },
-  {
-    key: '/admin/articles',
-    icon: <UploadOutlined />,
-    label: '文章管理',
-    children: [
-      { label: '文章分類', key: '/admin/articles/categories' },
-      { label: '文章資訊', key: '/admin/articles/list' },
-    ],
-  },
-  {
-    key: '/admin/users',
-    icon: <UserOutlined />,
-    label: '會員資訊',
-  },
-];
-
-const findOpenKeys = (key: string) => {
+const findOpenKeys = (key: string, menus: any) => {
   const result: string[] = [];
   const findInfo = (arr: any[]) => {
     arr.forEach((item) => {
@@ -58,11 +21,11 @@ const findOpenKeys = (key: string) => {
       }
     });
   };
-  findInfo(sideMenuData);
+  findInfo(menus);
   return result;
 };
 
-const findDeepPath = (key: string) => {
+const findDeepPath = (key: string, menus: any) => {
   const result: any[] = [];
 
   const findInfo = (arr: any[]) => {
@@ -74,7 +37,7 @@ const findDeepPath = (key: string) => {
       }
     });
   };
-  findInfo(sideMenuData);
+  findInfo(menus);
   const tempData = result.filter((item) => key.includes(item.key));
   if (tempData.length > 0) {
     return [{ label: '首頁', key: '/admin/dashboard' }, ...tempData];
@@ -83,6 +46,8 @@ const findDeepPath = (key: string) => {
 };
 
 const AppLayout = ({ children }: any) => {
+  const { menus } = useContext(context);
+
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer },
@@ -92,10 +57,10 @@ const AppLayout = ({ children }: any) => {
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const tempOpenKeys = findOpenKeys(pathname);
+  const tempOpenKeys = findOpenKeys(pathname, menus);
 
   useEffect(() => {
-    setBreadcrumbs(findDeepPath(pathname));
+    setBreadcrumbs(findDeepPath(pathname, menus));
   }, [pathname]);
 
   return (
@@ -112,7 +77,7 @@ const AppLayout = ({ children }: any) => {
           onClick={({ key }) => {
             navigate(key);
           }}
-          items={sideMenuData}
+          items={menus}
         />
       </Sider>
       <Layout className="site-layout">
@@ -157,7 +122,7 @@ const AppLayout = ({ children }: any) => {
         >
           <Breadcrumb>
             {breadcrumbs.map((item) => (
-              <Breadcrumb.Item key={item.label}>{item.label}</Breadcrumb.Item>
+              <Breadcrumb.Item key={item.key}>{item.label}</Breadcrumb.Item>
             ))}
           </Breadcrumb>
           {children}
